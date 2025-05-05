@@ -15,7 +15,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage = '';
-
+  passwordFieldType: string = 'password';
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -33,7 +33,11 @@ export class LoginComponent {
       ]]
     });
   }
+  
 
+  togglePasswordVisibility(): void {
+    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+  }
   get password() {
     return this.loginForm.get('password');
   }
