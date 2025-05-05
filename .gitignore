@@ -1,0 +1,33 @@
+# === Angular ===
+node_modules/
+dist/
+tmp/
+out-tsc/
+.angular/
+package-lock.json
+npm-debug.log
+.env
+
+# === .NET ===
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+*.vscode/
+*.dbmdl
+*.pidb
+*.svclog
+*.log
+*.pdb
+
+# === General ===
+*.DS_Store
+Thumbs.db
+.env.*
+*.vsidx
+.idea/
+.vsconfig
+
