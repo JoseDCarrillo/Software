@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage = '';
   passwordFieldType: string = 'password';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -23,28 +24,20 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/(?=.*[A-Z])/),               // al menos una mayúscula
-        Validators.pattern(/(?=.*[a-z])/),               // al menos una minúscula
-        Validators.pattern(/(?=.*\d)/),                  // al menos un número
-        Validators.pattern(/(?=.*[!@#$%^&*()])/),        // al menos un carácter especial
-      ]]
+      password: ['', [Validators.required, this.passwordValidator]]
     });
   }
-  
 
   togglePasswordVisibility(): void {
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
+
   get password() {
     return this.loginForm.get('password');
   }
 
   onSubmit() {
     if (this.loginForm.invalid) {
-      this.errorMessage = this.getPasswordError();
       return;
     }
 
@@ -62,14 +55,17 @@ export class LoginComponent {
     });
   }
 
-  getPasswordError(): string {
-    const errors = this.password?.errors;
-    if (!errors) return '';
+  // Validador personalizado de contraseña
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value || '';
+    const errors: ValidationErrors = {};
 
-    if (errors['required']) return 'La contraseña es obligatoria';
-    if (errors['minlength']) return 'Debe tener al menos 8 caracteres';
-    if (errors['pattern']) return 'Debe incluir mayúscula, minúscula, número y carácter especial';
+    if (value.length < 8) errors['minLength'] = true;
+    if (!/[A-Z]/.test(value)) errors['uppercase'] = true;
+    if (!/[a-z]/.test(value)) errors['lowercase'] = true;
+    if (!/\d/.test(value)) errors['number'] = true;
+    if (!/[!@#$%^&*()]/.test(value)) errors['specialChar'] = true;
 
-    return 'Contraseña inválida';
+    return Object.keys(errors).length ? errors : null;
   }
 }
